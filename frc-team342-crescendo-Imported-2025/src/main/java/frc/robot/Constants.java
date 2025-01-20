@@ -114,10 +114,10 @@ public static final double LOW_WRIST_POS = 0.9;
     public static final int[] BACK_RIGHT = {BACK_RIGHT_DRIVE_ID, BACK_RIGHT_ROTATE_ID};
 
     // Offsets
-    public static final double FRONT_LEFT_OFFSET = 0.89;
-    public static final double FRONT_RIGHT_OFFSET = 0.32;
+    public static final double FRONT_LEFT_OFFSET = 0.095;
+    public static final double FRONT_RIGHT_OFFSET = 0.319;
     public static final double BACK_LEFT_OFFSET = 2.64;
-    public static final double BACK_RIGHT_OFFSET = 0.77 ;
+    public static final double BACK_RIGHT_OFFSET = 0.79;
 
     public static final PPHolonomicDriveController PATH_CONFIG = new PPHolonomicDriveController(
       new PIDConstants(5, 0, 0), 

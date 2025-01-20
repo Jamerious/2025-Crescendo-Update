@@ -6,6 +6,11 @@ package frc.robot;
 
 
 import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+
+import java.io.ObjectInputFilter.Config;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -49,7 +54,6 @@ public class SwerveModule extends SubsystemBase {
     rotateConfig = new SparkMaxConfig();
 
     driveConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertDrive);
-
     rotateConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertRotate);
     
     driveEncoder = driveMotor.getEncoder();
@@ -63,7 +67,9 @@ public class SwerveModule extends SubsystemBase {
     rotateConfig.encoder
       .positionConversionFactor(DriveConstants.ROTATE_POSITION_CONVERSION)
       .velocityConversionFactor(DriveConstants.ROTATE_VELOCITY_CONVERSION);
-   
+
+      driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
+      rotateMotor.configure(rotateConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
 
     absoluteEncoder = new AnalogInput(magEncoderPort);
 

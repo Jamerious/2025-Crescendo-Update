@@ -10,6 +10,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkMaxConfig;
 //import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -52,6 +54,9 @@ public class Elevator extends SubsystemBase {
 
     elevator_left_Config.idleMode(IdleMode.kBrake).smartCurrentLimit(30).inverted(true);
     elevator_right_Config.idleMode(IdleMode.kBrake).smartCurrentLimit(30).inverted(true).follow(elevator_left, true);
+
+    elevator_left.configure(elevator_left_Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    elevator_right.configure(elevator_right_Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
 
     encoder = elevator_left.getEncoder();
   }

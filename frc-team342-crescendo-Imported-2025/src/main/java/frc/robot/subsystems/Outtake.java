@@ -9,6 +9,8 @@ import javax.management.relation.Relation;
 import com.revrobotics.spark.*;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SmartMotionConfig;
@@ -54,6 +56,8 @@ public class Outtake extends SubsystemBase {
     leftMotorConfig.smartCurrentLimit(OuttakeConstants.CURRENT_LIMIT).inverted(true).idleMode(IdleMode.kCoast);
     rightMotorConfig.smartCurrentLimit(OuttakeConstants.CURRENT_LIMIT).inverted(true).idleMode(IdleMode.kCoast).follow(rightMotor, true);
 
+    leftMotor.configure(leftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
+    rightMotor.configure(rightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = leftMotor.getEncoder();    
 
@@ -64,10 +68,13 @@ public class Outtake extends SubsystemBase {
     pidControllerSmartConfig = new SmartMotionConfig();
 
     //This didn't help
-    pidControllerConfig.p(OuttakeConstants.P_VALUE);
-    pidControllerConfig.velocityFF(OuttakeConstants.FF_VALUE);
+    leftMotorConfig.closedLoop.p(OuttakeConstants.P_VALUE);
+    //pidControllerConfig.p(OuttakeConstants.P_VALUE);
+    leftMotorConfig.closedLoop.velocityFF(OuttakeConstants.FF_VALUE);
+    //pidControllerConfig.velocityFF(OuttakeConstants.FF_VALUE);
     pidControllerSmartConfig.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
-    pidControllerConfig.outputRange(0, 5000);
+    leftMotorConfig.closedLoop.outputRange(0, 5000);
+   // pidControllerConfig.outputRange(0, 5000);
   }
 
   public void shootPercent(double speed){

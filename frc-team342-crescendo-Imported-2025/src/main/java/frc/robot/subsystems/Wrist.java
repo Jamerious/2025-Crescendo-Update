@@ -14,9 +14,9 @@ import com.revrobotics.config.*;
 import static frc.robot.Constants.IntakeConstants.*;
 
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SmartMotionConfig;
 import com.revrobotics.spark.config.ClosedLoopConfigAccessor;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -32,7 +32,7 @@ public class Wrist extends SubsystemBase {
 
   private final SparkClosedLoopController wristController;
 
-  private final ClosedLoopConfig wristControllerConfig;
+ // private final ClosedLoopConfig wristControllerConfig;
 
   private final SmartMotionConfig wristControllerSmartConfig;
   
@@ -43,17 +43,23 @@ public class Wrist extends SubsystemBase {
     wrist = new SparkMax(WRIST_ID, SparkLowLevel.MotorType.kBrushless);
    
     wristConfig = new SparkMaxConfig();
-
-    wristControllerConfig = new ClosedLoopConfig();
+    
+   //wristControllerConfig = new ClosedLoopConfig();
 
     wristControllerSmartConfig = new SmartMotionConfig();
 
     wristConfig.smartCurrentLimit(30).idleMode(IdleMode.kBrake);
 
+    wristConfig.closedLoop.p(0.01);
+
     wristController = wrist.getClosedLoopController();
-    wristControllerConfig.p(0.01);
+   // wristControllerConfig.p(0.01);
+
+
     //wristControllerSmartConfig.allowedClosedLoopError(0.01, null);
-   
+
+    wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
 
     throughBore = new DutyCycleEncoder(2);
   }

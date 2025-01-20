@@ -109,7 +109,7 @@ public class SwerveDrive extends SubsystemBase {
       DriveConstants.BACK_RIGHT_OFFSET,
       DriveConstants.BR_PID_VALUES);
 
-      gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+      gyro = new AHRS(AHRS.NavXComType.kUSB1);
 
     states = new SwerveModuleState[] {
       frontLeft.getState(),

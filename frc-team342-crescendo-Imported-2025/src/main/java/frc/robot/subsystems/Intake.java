@@ -7,10 +7,10 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.IntakeConstants.*;
 
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 //import com.revrobotics.config.BaseConfig;
 //import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -58,14 +58,20 @@ public class Intake extends SubsystemBase {
 
     intakeConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60);
 
+    intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
+
     //intake.setSmartCurrentLimit(60);
 
     intakeSensor = new DigitalInput(5);
     encoder = intake.getEncoder();
 
     controller = intake.getClosedLoopController();
-    controllerConfig.p(0.01);
-    controllerConfig.velocityFF(0.02);
+
+    intakeConfig.closedLoop.p(0.01);
+    //controllerConfig.p(0.01);
+    intakeConfig.closedLoop.p(0.02);
+    //controllerConfig.velocityFF(0.02);
+
     velocity = 0.50;
   }
 
