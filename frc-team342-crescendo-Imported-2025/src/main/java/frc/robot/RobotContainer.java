@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import static frc.robot.Constants.DriveConstants.MAX_DRIVE_SPEED;
 import static frc.robot.Constants.IntakeConstants.*;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -123,6 +125,7 @@ public class RobotContainer {
     elevator = new Elevator();
     wrist = new Wrist();
     swerve = new SwerveDrive();
+    swerve.resetEncoder();
 
     operator = new XboxController(0);
     driveWithJoystick = new DriveWithJoystick(swerve, operator, false, false);
@@ -160,7 +163,7 @@ public class RobotContainer {
     toggleSlowModeBtn = new JoystickButton(driver, XboxController.Button.kX.value);
 
     resetEncoderBtn = new JoystickButton(driver, XboxController.Button.kY.value);
-    resetEncoder = Commands.runOnce(() -> {swerve.resetFrontLeft();}, swerve);
+    resetEncoder = Commands.runOnce(() -> {swerve.resetEncoder();}, swerve);
   
 
     load = new Load(outtake, intake);
@@ -199,6 +202,8 @@ public class RobotContainer {
     autoChooser.addOption("Do nothing", Autos.DoNothing());
     autoChooser.addOption("Leave No Shoot", Autos.Leave(swerve));
     autoChooser.setDefaultOption("Default", Autos.DoNothing());
+
+    autoChooser.addOption("PathPlanerTest", new PathPlannerAuto("New Auto"));
    
    SmartDashboard.putData(swerve);
    SmartDashboard.putData(outtake);

@@ -43,8 +43,10 @@ public class SwerveModule extends SubsystemBase {
 
   private double encoderOffset;
 
+  private String label;
+
   /** Creates a new SwerveModule. */
-  public SwerveModule(int driveID, int rotateID, int magEncoderPort, boolean invertRotate, boolean invertDrive, double encoderOffset, double[] PID_values) {
+  public SwerveModule(int driveID, int rotateID, int magEncoderPort, boolean invertRotate, boolean invertDrive, double encoderOffset, double[] PID_values, String label) {
     
     // System.out.println("Drive: " + driveID + " rotate: " + rotateID);
     driveMotor = new SparkMax(driveID, MotorType.kBrushless);
@@ -53,8 +55,8 @@ public class SwerveModule extends SubsystemBase {
     driveConfig = new SparkMaxConfig();
     rotateConfig = new SparkMaxConfig();
 
-    driveConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertDrive);
-    rotateConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertRotate);
+    driveConfig.smartCurrentLimit(60).idleMode(IdleMode.kCoast).inverted(invertDrive);
+    rotateConfig.smartCurrentLimit(60).idleMode(IdleMode.kCoast).inverted(invertRotate);
     
     driveEncoder = driveMotor.getEncoder();
 
@@ -75,8 +77,12 @@ public class SwerveModule extends SubsystemBase {
 
     rotateController = new PIDController(PID_values[0], PID_values[1], PID_values[2]);
     rotateController.enableContinuousInput(-Math.PI, Math.PI);
+    
+    this.encoderOffset = encoderOffset;
 
-    resetEncoder(); this.encoderOffset = encoderOffset;
+    resetEncoder(); 
+
+    this.label = label;
   }
 
   /**
@@ -87,7 +93,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   /**
-   * @return Rotate encoder position in meters.
+   * @return Rotate encoder position in radians.
    */
   public double getRotatePosition() {
     return rotateEncoder.getPosition();
@@ -133,15 +139,7 @@ public class SwerveModule extends SubsystemBase {
     // If a ceaartin swere module starts having issues, CHECK MOTOR CONTROLLER
 
     driveEncoder.setPosition(0);
-    System.out.println("Absoulete Enconder is reading " + getAbsoluteEncoderRad());
-    System.out.println(rotateEncoder.getPosition() % (2 * Math.PI));
-    System.out.println("Encoder was " + rotateEncoder.getPosition());
     rotateEncoder.setPosition(getAbsoluteEncoderRad());
-    System.out.println("After setting postition, Absoulete Enconder is reading " + getAbsoluteEncoderRad());
-    System.out.println(rotateEncoder.getPosition() % (2 * Math.PI));
-    System.out.println("After setting postition, Enconder is now " + rotateEncoder.getPosition());
-
-
 
   }
 
@@ -163,24 +161,24 @@ public class SwerveModule extends SubsystemBase {
       stop();
       return;
     }
-    state = SwerveModuleState.optimize(state, getState().angle);
+    state.optimize(getState().angle);
     driveMotor.set(state.speedMetersPerSecond / DriveConstants.MAX_DRIVE_SPEED);
     rotateMotor.set(rotateController.calculate(getRotatePosition(), state.angle.getRadians()));
-
-   // System.out.println("PID Rotate Position" + getRotatePosition());
-   // System.out.println("State Angle Radians" + state.angle.getRadians());
+    System.out.println((label) + ": " + getRotatePosition() + " - " + state.angle.getRadians() + " = " + (getRotatePosition() - state.angle.getRadians()));
+    //System.out.println("PID Rotate Position" + getRotatePosition());
+    //System.out.println("State Angle Radians" + state.angle.getRadians());
   }
 
   public void setCoastMode() {
 
-    driveConfig.idleMode(IdleMode.kBrake);
+    driveConfig.idleMode(IdleMode.kCoast);
     rotateConfig.idleMode(IdleMode.kCoast);
 
   }
 
   public void setBrakeMode() {
     driveConfig.idleMode(IdleMode.kBrake);
-    rotateConfig.idleMode(IdleMode.kCoast);
+    rotateConfig.idleMode(IdleMode.kBrake);
   }
 
   @Override

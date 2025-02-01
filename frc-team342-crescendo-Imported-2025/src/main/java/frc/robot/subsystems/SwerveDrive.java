@@ -83,7 +83,8 @@ public class SwerveDrive extends SubsystemBase {
       DriveConstants.FL_ENCODER_PORT,
       false, false,
       DriveConstants.FRONT_LEFT_OFFSET,
-      DriveConstants.FL_PID_VALUES);
+      DriveConstants.FL_PID_VALUES, "FL"
+      );
 
     frontRight = new SwerveModule(
       DriveConstants.FRONT_RIGHT[0], 
@@ -91,7 +92,7 @@ public class SwerveDrive extends SubsystemBase {
       DriveConstants.FR_ENCODER_PORT,
       false, true,
       DriveConstants.FRONT_RIGHT_OFFSET,
-      DriveConstants.FR_PID_VALUES);
+      DriveConstants.FR_PID_VALUES, "FR");
    
     backLeft = new SwerveModule(
       DriveConstants.BACK_LEFT[0],
@@ -99,7 +100,7 @@ public class SwerveDrive extends SubsystemBase {
       DriveConstants.BL_ENCODER_PORT,
       false, false,
       DriveConstants.BACK_LEFT_OFFSET,
-      DriveConstants.BL_PID_VALUES);  
+      DriveConstants.BL_PID_VALUES, "BL");  
       
     backRight = new SwerveModule(
       DriveConstants.BACK_RIGHT[0],
@@ -107,9 +108,9 @@ public class SwerveDrive extends SubsystemBase {
       DriveConstants.BR_ENCODER_PORT,
       false, true,
       DriveConstants.BACK_RIGHT_OFFSET,
-      DriveConstants.BR_PID_VALUES);
+      DriveConstants.BR_PID_VALUES, "BR");
 
-      gyro = new AHRS(AHRS.NavXComType.kUSB1);
+      gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     states = new SwerveModuleState[] {
       frontLeft.getState(),
@@ -156,12 +157,12 @@ public class SwerveDrive extends SubsystemBase {
     configureAutoBuilder();
   } 
 
-  public void resetFrontLeft() {
+  public void resetEncoder() {
 
-    frontLeft.resetEncoder();
-    //frontRight.resetEncoder();
-   // backLeft.resetEncoder();
-    //backRight.resetEncoder();
+    // frontLeft.resetEncoder();
+    // frontRight.resetEncoder();
+    // backLeft.resetEncoder();
+    // backRight.resetEncoder();
 
   }
 
@@ -361,6 +362,7 @@ public class SwerveDrive extends SubsystemBase {
     sendableBuilder.addBooleanProperty("Slow mode", () -> getSlowMode(), null);
     sendableBuilder.addDoubleProperty("Heading", () -> getHeading(), null);
     putOffsets(sendableBuilder);
+    
    }  
 
   @Override
