@@ -7,22 +7,14 @@ package frc.robot;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Climb;
-import frc.robot.commands.Load;
-import frc.robot.commands.MoveWristPercent;
-import frc.robot.commands.MoveWristToPosition;
-import frc.robot.commands.RumbleWhenNote;
-import frc.robot.commands.ToggleClimbMode;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.TimedDrive;
-import frc.robot.commands.Drive.DriveWithJoystick;
+import frc.robot.commands.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
 import static frc.robot.Constants.DriveConstants.MAX_DRIVE_SPEED;
 import static frc.robot.Constants.IntakeConstants.*;
-
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -87,6 +79,9 @@ public class RobotContainer {
 
   private JoystickButton toggleFieldOrientedBtn;
   private JoystickButton toggleSlowModeBtn;
+    
+  private Command toggleSlowMode;
+  private Command toggleFieldOrienated;
 
   private JoystickButton timedDriveButton;
   private JoystickButton outtakeNoteBtn;
@@ -97,6 +92,7 @@ public class RobotContainer {
   private JoystickButton rotateToSpeakerBtn;
   private JoystickButton resetEncoderBtn;
   private Command resetEncoder;
+ 
 
   private JoystickButton climbButton;
 
@@ -125,10 +121,9 @@ public class RobotContainer {
     elevator = new Elevator();
     wrist = new Wrist();
     swerve = new SwerveDrive();
-    swerve.resetEncoder();
 
     operator = new XboxController(0);
-    driveWithJoystick = new DriveWithJoystick(swerve, operator, false, false);
+    driveWithJoystick = new DriveWithJoystick(swerve, driver);
 
     toggleFieldOrientedBtn = new JoystickButton(operator, XboxController.Button.kA.value);
     toggleSlowModeBtn = new JoystickButton(operator, XboxController.Button.kX.value);
@@ -162,10 +157,6 @@ public class RobotContainer {
     toggleFieldOrientedBtn = new JoystickButton(driver, XboxController.Button.kA.value);
     toggleSlowModeBtn = new JoystickButton(driver, XboxController.Button.kX.value);
 
-    resetEncoderBtn = new JoystickButton(driver, XboxController.Button.kY.value);
-    resetEncoder = Commands.runOnce(() -> {swerve.resetEncoder();}, swerve);
-  
-
     load = new Load(outtake, intake);
     climb = new Climb(elevator, operator);
 
@@ -183,9 +174,10 @@ public class RobotContainer {
     rumbleWhenNote = new RumbleWhenNote(intake, operator);
 
     timeMove = new TimedDrive(swerve, 5, new ChassisSpeeds(0.5, 0, 0), MAX_DRIVE_SPEED);
-
-    autoChooser = new SendableChooser<>();
     
+    toggleSlowMode = Commands.runOnce(() -> {swerve.toggleSlowMode();}, swerve);
+    toggleFieldOrienated = Commands.runOnce(() -> {swerve.toggleFieldOriented();}, swerve);
+
     wrist.setDefaultCommand(moveWristPercent);
     swerve.setDefaultCommand(driveWithJoystick);
     elevator.setDefaultCommand(climb);
@@ -203,7 +195,10 @@ public class RobotContainer {
     autoChooser.addOption("Leave No Shoot", Autos.Leave(swerve));
     autoChooser.setDefaultOption("Default", Autos.DoNothing());
 
-    autoChooser.addOption("PathPlanerTest", new PathPlannerAuto("New Auto"));
+    //PathPlannerAuto autoTest = new PathPlannerAuto("New Auto");
+    //autoTest.getPathGroupFromAutoFile("New Auto");
+    // autoChooser.addOption("PathPlannerTest", new PathPlannerAuto("Test Auto"));
+    autoChooser.addOption("PathplannerTest", Autos.PathPlannerTest(swerve));
    
    SmartDashboard.putData(swerve);
    SmartDashboard.putData(outtake);
@@ -214,15 +209,6 @@ public class RobotContainer {
   //  swerve.putOffsets(null);
     configureBindings();
   } 
-
-  public void setBrakeMode() {
-    swerve.setBrakeMode();
-  }
-
-  public void setCoastMode() {
-    swerve.setCoastMode();
-  }
-
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
@@ -242,13 +228,11 @@ public class RobotContainer {
     wristLeftBtn.onTrue(wristAmpIntake); // Right on D-Pad
     wristRightBtn.onTrue(wristAmpIntake); // Left on D-Pad
 
-    rotateToAmpBtn.whileTrue(new DriveWithJoystick(swerve, driver, false, true));
-    rotateToSpeakerBtn.whileTrue(new DriveWithJoystick(swerve, driver, true, false));
-
     climbButton.whileTrue(toggleClimbMode);
 
-    toggleFieldOrientedBtn.whileTrue(swerve.toggleFieldOriented());
-    toggleSlowModeBtn.whileTrue(swerve.toggleSlowMode());
+    toggleFieldOrientedBtn.whileTrue(toggleFieldOrienated);
+    toggleSlowModeBtn.whileTrue(toggleSlowMode);
+    
     resetEncoderBtn.onTrue(resetEncoder);
   }
 

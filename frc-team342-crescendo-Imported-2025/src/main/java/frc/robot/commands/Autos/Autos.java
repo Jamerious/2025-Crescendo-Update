@@ -14,10 +14,14 @@ import static frc.robot.Constants.DriveConstants.MAX_DRIVE_SPEED;
 import static frc.robot.Constants.IntakeConstants.HIGH_WRIST_POS;
 import static frc.robot.Constants.IntakeConstants.LOW_WRIST_POS;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Load;
 import frc.robot.commands.MoveWristToPosition;
 import frc.robot.commands.RotateToAngle;
@@ -335,6 +339,24 @@ public static Command Leave(SwerveDrive swerve) {
   return Commands.sequence(
   new TimedDrive(swerve, 10, new ChassisSpeeds(0,0,0), MAX_DRIVE_SPEED), // Hacky delay
   new TimedDrive(swerve, 2.5, new ChassisSpeeds(1,0,0), MAX_DRIVE_SPEED));
+}
+
+//Using this to test pathplanner (As of 2/3/25)
+public static Command PathPlannerTest(SwerveDrive swerve){
+  try{
+    PathPlannerPath testPath1 = PathPlannerPath.fromPathFile("Collect-N1");
+    PathPlannerPath testPath2 = PathPlannerPath.fromPathFile("Test-Path-2");
+    return Commands.sequence(
+      AutoBuilder.followPath(testPath1),
+      new WaitCommand(1.0),
+      AutoBuilder.followPath(testPath2)
+      );
+  }
+  catch (Exception e){
+    System.out.println("Didn't work");
+    return Commands.none();
+  }
+  
 }
 
   private Autos() {

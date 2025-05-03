@@ -55,8 +55,8 @@ public class SwerveModule extends SubsystemBase {
     driveConfig = new SparkMaxConfig();
     rotateConfig = new SparkMaxConfig();
 
-    driveConfig.smartCurrentLimit(60).idleMode(IdleMode.kCoast).inverted(invertDrive);
-    rotateConfig.smartCurrentLimit(60).idleMode(IdleMode.kCoast).inverted(invertRotate);
+    driveConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertDrive);
+    rotateConfig.smartCurrentLimit(60).idleMode(IdleMode.kBrake).inverted(invertRotate);
     
     driveEncoder = driveMotor.getEncoder();
 
@@ -129,6 +129,7 @@ public class SwerveModule extends SubsystemBase {
   */
   public double getOffsets() {
     double angle = absoluteEncoder.getVoltage() / RobotController.getVoltage5V();
+    //System.out.println(absoluteEncoder.getVoltage());
     angle *= 2 * Math.PI;
 
     return angle * (absEncoderReverse ? -1.0 : 1.0); 
@@ -164,7 +165,7 @@ public class SwerveModule extends SubsystemBase {
     state.optimize(getState().angle);
     driveMotor.set(state.speedMetersPerSecond / DriveConstants.MAX_DRIVE_SPEED);
     rotateMotor.set(rotateController.calculate(getRotatePosition(), state.angle.getRadians()));
-    System.out.println((label) + ": " + getRotatePosition() + " - " + state.angle.getRadians() + " = " + (getRotatePosition() - state.angle.getRadians()));
+    //System.out.println((label) + ": " + getRotatePosition() + " - " + state.angle.getRadians() + " = " + (getRotatePosition() - state.angle.getRadians()));
     //System.out.println("PID Rotate Position" + getRotatePosition());
     //System.out.println("State Angle Radians" + state.angle.getRadians());
   }
